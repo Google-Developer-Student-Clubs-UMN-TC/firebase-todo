@@ -1,6 +1,7 @@
 import './App.css';
 import React from 'react';
 import Auth from './auth.js';
+import Todo from './todo.js';
 import { Container } from '@mui/material';
 import {
   BrowserRouter as Router,
@@ -25,20 +26,31 @@ export const app = initializeApp(firebaseConfig);
 // eslint-disable-next-line
 export const analytics = getAnalytics(app);
 
-function App() {
-  return (
-    <div className="App">
-      <Router>
-        <Routes>
-          <Route path="/login" element={
-            <Container maxWidth="sm">
-              <Auth auth={app}/>
-            </Container>
-          }/>
-        </Routes>
-      </Router>
-    </div>
-  );
-}
+export default class App extends React.Component{
+  constructor(props) {
+    super(props);
+    this.state = {
 
-export default App;
+    }
+  }
+  render () {
+    return (
+      <div className="App">
+        <Router>
+          <Routes>
+            <Route path="/login" element={
+              <Container maxWidth="sm">
+                <Auth auth={app}/>
+              </Container>
+            }/>
+            <Route path="/home" element={
+              <Container maxWidth="sm">
+                <Todo todo={app}/>
+              </Container>
+            }/>
+          </Routes>
+        </Router>
+      </div>
+    );
+  }
+}
