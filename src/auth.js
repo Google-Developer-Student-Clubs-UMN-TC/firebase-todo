@@ -3,12 +3,34 @@ import { Card, Button, CardMedia, CardActions, Grid, CardHeader, CardContent, Te
 import {
     getAuth,
     signInWithEmailAndPassword,
+    createUserWithEmailAndPassword
 } from "firebase/auth";
+
+import { connectAuthEmulator } from "firebase/auth";
+
 
 class Auth extends React.Component {
     constructor(props) {
         super(props);
-        this.auth = getAuth(props.app);
+        this.auth = getAuth(props.firebase);
+        this.state = {
+            error: {
+                email: {
+                    status: false,
+                    message: undefined
+                },
+                password: {
+                    status: false,
+                    message: undefined
+                }
+            }
+        };
+        if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development')
+            connectAuthEmulator(this.auth, "http://localhost:9099");
+    }
+
+    validateForm() {
+        return false;
     }
 
     render() {
@@ -32,23 +54,39 @@ class Auth extends React.Component {
                                 />}
                             />
                             <CardContent component="form">
-                                <TextField inputRef={(email) => this.email = email} fullWidth type="email" label={"Email"} required></TextField>
-                                <TextField inputRef={(pass) => this.password = pass} fullWidth margin="normal" type="password" label={"Password"} required></TextField>
+                                <TextField
+                                    fullWidth type="email" label={"Email"} required
+                                    error={this.state.error.email.status} helperText={this.state.error.email.message}
+                                    inputRef={email => this.email = email} />
+                                <TextField
+                                    fullWidth margin="normal" type="password" label={"Password"} required
+                                    error={this.state.error.password.status} helperText={this.state.error.password.message}
+                                    inputRef={password => this.password = password} />
                             </CardContent>
                             <CardActions>
                                 <Button onClick={() => {
-                                    signInWithEmailAndPassword(this.auth, this.email, this.password)
-                                        .then((userCredential) => {
-                                            alert(userCredential);
-                                            // const user = userCredential.user;
-                                        })
-                                        .catch((error) => {
-                                            alert(error);
-                                            // const errorCode = error.code;
-                                            // const errorMessage = error.message;
-                                        });
+                                    if (this.validateForm())
+                                        signInWithEmailAndPassword(this.auth, this.email.value, this.password.value)
+                                            .then((userCredential) => {
+                                                this.props.onLogIn(userCredential);
+                                            })
+                                            .catch((error) => {
+                                                console.log(error.code);
+                                                console.log(error.message);
+                                            });
                                 }}>Log In</Button>
-                                <Button>Sign Up</Button>
+                                <Button onClick={() => {
+                                    if (this.validateForm()) {
+                                        createUserWithEmailAndPassword(this.auth, this.email.value, this.password.value)
+                                            .then((userCredential) => {
+                                                this.props.onSignUp(userCredential);
+                                            })
+                                            .catch((error) => {
+                                                console.log(error.code);
+                                                console.log(error.message);
+                                            });
+                                    }
+                                }}>Sign Up</Button>
                             </CardActions>
                         </Card>
                     </div>
