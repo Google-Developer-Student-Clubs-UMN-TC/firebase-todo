@@ -28,7 +28,7 @@ export const analytics = getAnalytics(app);
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { userCredential: undefined };
+    this.state = { userCredential: "undefined" };
   }
 
   render() {
@@ -36,7 +36,7 @@ class App extends React.Component {
       <div className="App">
         <Router>
           <Routes>
-            <Route path="/" element={this.userCredentials == null
+            <Route path="/" element={this.userCredentials === undefined
               ? <Navigate to={{ pathname: "/login", }} />
               : <Navigate to={{ pathname: "/", state: { user: this.userCredentials } }} />} />
             <Route path="/home">

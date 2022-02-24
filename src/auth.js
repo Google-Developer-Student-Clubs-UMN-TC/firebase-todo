@@ -3,7 +3,8 @@ import { Card, Button, CardMedia, CardActions, Grid, CardHeader, CardContent, Te
 import {
     getAuth,
     signInWithEmailAndPassword,
-    createUserWithEmailAndPassword
+    createUserWithEmailAndPassword,
+    // AuthErrorCodes
 } from "firebase/auth";
 
 import { connectAuthEmulator } from "firebase/auth";
@@ -30,7 +31,7 @@ class Auth extends React.Component {
     }
 
     validateForm() {
-        return false;
+        return true;
     }
 
     render() {
