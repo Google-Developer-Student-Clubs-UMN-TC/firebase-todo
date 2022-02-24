@@ -5,7 +5,7 @@ import Todo from './todo.js';
 import { Container } from '@mui/material';
 import {
   BrowserRouter as Router,
-  Routes, Route
+  Routes, Route, Navigate
 } from "react-router-dom";
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
@@ -26,28 +26,34 @@ export const app = initializeApp(firebaseConfig);
 // eslint-disable-next-line
 export const analytics = getAnalytics(app);
 
-export default class App extends React.Component{
+class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-
-    }
+    this.state = { userCredential: "undefined" };
   }
-  render () {
+
+  render() {
     return (
       <div className="App">
         <Router>
           <Routes>
+            <Route path="/" element={this.userCredentials === undefined
+              ? <Navigate to={{ pathname: "/login", }} />
+              : <Navigate to={{ pathname: "/", state: { user: this.userCredentials } }} />} />
+            <Route path="/home">
+              <Container maxWidth="xl">
+                {/* <Todo firebase={app} userCredential={this.state.userCredential} /> */}
+              </Container>
+            </Route>
             <Route path="/login" element={
               <Container maxWidth="sm">
-                <Auth auth={app}/>
+                <Auth firebase={app} onLogIn={(user) => {
+                  this.setState({ userCredential: user });
+                }} onSignUp={(user) => {
+                  this.setState({ userCredential: user });
+                }} />
               </Container>
-            }/>
-            <Route path="/home" element={
-              <Container maxWidth="sm">
-                <Todo todo={app}/>
-              </Container>
-            }/>
+            } />
           </Routes>
         </Router>
       </div>
