@@ -40,7 +40,9 @@ class App extends React.Component {
               ? <Navigate to={{ pathname: "/login", }} />
               : <Navigate to={{ pathname: "/", state: { user: this.userCredentials } }} />} />
             <Route path="/home">
-              {/* <Todo firebase={app} userCredential={this.state.userCredential} /> */}
+              <Container maxWidth="xl">
+                {/* <Todo firebase={app} userCredential={this.state.userCredential} /> */}
+              </Container>
             </Route>
             <Route path="/login" element={
               <Container maxWidth="sm">
