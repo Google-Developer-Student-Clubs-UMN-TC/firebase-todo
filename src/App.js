@@ -40,11 +40,11 @@ class App extends React.Component {
             <Route path="/" element={this.userCredentials === undefined
               ? <Navigate to={{ pathname: "/login", }} />
               : <Navigate to={{ pathname: "/", state: { user: this.userCredentials } }} />} />
-            <Route path="/home">
+            <Route path="/home" element={
               <Container maxWidth="xl">
-                {/* <Todo firebase={app} userCredential={this.state.userCredential} /> */}
+                <Todo firebase={app} userCredential={this.state.userCredential}/>
               </Container>
-            </Route>
+            } />
             <Route path="/login" element={
               <Container maxWidth="sm">
                 <Auth firebase={app} onLogIn={(user) => {
@@ -60,3 +60,4 @@ class App extends React.Component {
     );
   }
 }
+export default App;
