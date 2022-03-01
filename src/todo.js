@@ -15,36 +15,32 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import {
-    getAuth,
-    signInWithEmailAndPassword,
-} from "firebase/auth";
+    getFirestore
+} from "firebase/firestore";
 
 class Todo extends React.Component {
     constructor(props) {
         super(props);
+        this.db = getFirestore(props.firebase);
         this.state = {
-            tasks: ["Sample Task"],
+            tasks: ["Sample Task","Sample Task 2"],
             newText: "",
-            checked: [],
-            setChecked: [],
+            checked: null,
             currIndex: 0,
-            triggerAlert: false,
-            alertFieldValue: ""
+            triggerAlert: false
         }
+        this.state.checked = Array(this.state.tasks.length).fill(false);
     }
     
-    handleToggle(value) {
-        // const currentIndex = this.state.checked.indexOf(value);
-        // const newChecked = [...this.state.checked];
-
-        // if (currentIndex === -1) {
-        //     newChecked.push(value);
-        // } else {
-        //     newChecked.splice(currentIndex, 1);
-        // }
-
-        // this.state.setChecked(newChecked);
-        alert("I am in handle toggle");
+    handleCheck(index) {
+        const newChecked = [...this.state.checked];
+        if(this.state.checked[index]) {
+            newChecked[index] = false;
+            this.setState({checked: newChecked});
+        } else {
+            newChecked[index] = true;
+            this.setState({checked: newChecked});
+        }
     };
     
     handleTaskEdit(index) {
@@ -56,24 +52,17 @@ class Todo extends React.Component {
         });
     }
     
-    handleTextFieldChange = e => {
-        this.setState({
-            alertFieldValue: e.target.value,
-            newText: e.target.value
-        });
+    handleTextFieldChange = event => {
+        this.setState({newText: event.target.value});
     }
-    
-    handleAlertOpen = () => {
-        this.setState({triggerAlert: true});
-    };
     
     handleAlertClose = () => {
         const temp = this.state.tasks;
         temp[this.state.currIndex] = this.state.newText;
         this.setState({
-            alertFieldValue: "",
-            tasks: temp});
-        this.setState({triggerAlert: false});
+            tasks: temp,
+            triggerAlert: false
+        });
     };
 
     render() {
@@ -83,8 +72,7 @@ class Todo extends React.Component {
                     <DialogTitle>Subscribe</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
-                            To subscribe to this website, please enter your email address here. We
-                            will send updates occasionally.
+                            Edit your task description
                         </DialogContentText>
                         <TextField
                             autoFocus
@@ -94,13 +82,11 @@ class Todo extends React.Component {
                             type="email"
                             fullWidth
                             variant="standard"
-                            value={this.state.alertFieldValue}
                             onChange={this.handleTextFieldChange}
                         />
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={this.handleAlertClose}>Cancel</Button>
-                        <Button onClick={this.handleAlertClose}>Subscribe</Button>
+                        <Button onClick={this.handleAlertClose}>Submit</Button>
                     </DialogActions>
                 </Dialog>
                 {this.state.tasks.map((value, index) => {
@@ -119,8 +105,8 @@ class Todo extends React.Component {
                                 <ListItemIcon>
                                     <Checkbox
                                         edge="start"
-                                        checked={this.state.checked.indexOf(value) !== -1}
-                                        tabIndex={-1}
+                                        checked={this.state.checked[index]}
+                                        onChange={() => this.handleCheck(index)}
                                         disableRipple
                                         inputProps={{ 'aria-label': 'controlled' }}
                                     />
