@@ -29,7 +29,7 @@ export const analytics = getAnalytics(app);
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { userCredential: "undefined" };
+    this.state = { userCredential: undefined };
   }
 
   render() {
@@ -37,20 +37,22 @@ class App extends React.Component {
       <div className="App">
         <Router>
           <Routes>
-            <Route path="/" element={this.userCredentials === undefined
+            <Route path="/" element={this.state.userCredentials === undefined
               ? <Navigate to={{ pathname: "/login", }} />
-              : <Navigate to={{ pathname: "/", state: { user: this.userCredentials } }} />} />
+              : <Navigate to={{ pathname: "/home", state: { user: this.state.userCredentials } }} />} />
             <Route path="/home" element={
               <Container maxWidth="xl">
-                <Todo firebase={app} userCredential={this.state.userCredential}/>
+                <Todo firebase={app} userCredential={this.state.userCredential} />
               </Container>
             } />
             <Route path="/login" element={
               <Container maxWidth="sm">
                 <Auth firebase={app} onLogIn={(user) => {
                   this.setState({ userCredential: user });
+                  window.location.replace("/home");
                 }} onSignUp={(user) => {
                   this.setState({ userCredential: user });
+                  window.location.replace("/home");
                 }} />
               </Container>
             } />
