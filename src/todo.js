@@ -23,26 +23,28 @@ class Todo extends React.Component {
         super(props);
         this.db = getFirestore(props.firebase);
         this.state = {
-            tasks: ["Sample Task","Sample Task 2"],
+            tasks: ["Sample Task", "Sample Task 2"],
             newText: "",
             checked: null,
             currIndex: 0,
             triggerAlert: false
         }
         this.state.checked = Array(this.state.tasks.length).fill(false);
+        if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development')
+            connectAuthEmulator(this.db, "http://localhost:8080");
     }
-    
+
     handleCheck(index) {
         const newChecked = [...this.state.checked];
-        if(this.state.checked[index]) {
+        if (this.state.checked[index]) {
             newChecked[index] = false;
-            this.setState({checked: newChecked});
+            this.setState({ checked: newChecked });
         } else {
             newChecked[index] = true;
-            this.setState({checked: newChecked});
+            this.setState({ checked: newChecked });
         }
     };
-    
+
     handleTaskEdit(index) {
         // open popup that has an accept and cancel button to accept new value for the specific task
         // set the task text to whatever value the user inputs
@@ -51,11 +53,11 @@ class Todo extends React.Component {
             currIndex: index
         });
     }
-    
+
     handleTextFieldChange = event => {
-        this.setState({newText: event.target.value});
+        this.setState({ newText: event.target.value });
     }
-    
+
     handleAlertClose = () => {
         const temp = this.state.tasks;
         temp[this.state.currIndex] = this.state.newText;
