@@ -15,7 +15,10 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import {
-    getFirestore
+    getFirestore,
+    collection,
+    connectFirestoreEmulator,
+    addDoc
 } from "firebase/firestore";
 
 class Todo extends React.Component {
@@ -23,15 +26,42 @@ class Todo extends React.Component {
         super(props);
         this.db = getFirestore(props.firebase);
         this.state = {
-            tasks: ["Sample Task", "Sample Task 2"],
+            tasks: null,
             newText: "",
             checked: null,
             currIndex: 0,
-            triggerAlert: false
+            triggerEditAlert: false,
+            triggerAddAlert: false
+        }
+        if(this.state.tasks!==null) this.state.checked = Array(this.state.tasks.length).fill(false);
+        else {
+            console.log("I am here");
+            this.state.tasks = [];
+            this.state.checked = Array(this.state.tasks.length).fill(false);
         }
         this.state.checked = Array(this.state.tasks.length).fill(false);
         if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development')
-            connectAuthEmulator(this.db, "http://localhost:8080");
+            connectFirestoreEmulator(this.db, "http://localhost:8080");
+    }
+    
+    addTask() {
+        try {
+            const docRef = addDoc(collection(this.db, "users"), {
+                first: "Ada",
+                last: "Lovelace",
+                born: 1815,
+                special: this.state.newText
+            });
+            console.log("Document written with ID: ", docRef.id);
+        } catch (e) {
+            console.error("Error adding document: ", e);
+        }
+    }
+
+    handleAdd = () => {
+        this.setState({
+            triggerAddAlert: true,
+        });
     }
 
     handleCheck(index) {
@@ -49,7 +79,7 @@ class Todo extends React.Component {
         // open popup that has an accept and cancel button to accept new value for the specific task
         // set the task text to whatever value the user inputs
         this.setState({
-            triggerAlert: true,
+            triggerEditAlert: true,
             currIndex: index
         });
     }
@@ -58,20 +88,20 @@ class Todo extends React.Component {
         this.setState({ newText: event.target.value });
     }
 
-    handleAlertClose = () => {
+    handleAlertEditClose = () => {
         const temp = this.state.tasks;
         temp[this.state.currIndex] = this.state.newText;
         this.setState({
             tasks: temp,
-            triggerAlert: false
+            triggerEditAlert: false
         });
     };
 
     render() {
         return (
             <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
-                <Dialog open={this.state.triggerAlert} onClose={this.handleAlertClose}>
-                    <DialogTitle>Subscribe</DialogTitle>
+                <Dialog open={this.state.triggerEditAlert} onClose={this.handleAlertEditClose}>
+                    <DialogTitle>Edit Task</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
                             Edit your task description
@@ -88,7 +118,7 @@ class Todo extends React.Component {
                         />
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={this.handleAlertClose}>Submit</Button>
+                        <Button onClick={this.handleAlertEditClose}>Submit</Button>
                     </DialogActions>
                 </Dialog>
                 {this.state.tasks.map((value, index) => {
@@ -118,6 +148,38 @@ class Todo extends React.Component {
                         </ListItem>
                     );
                 })}
+                <ListItemButton onClick={this.handleAdd}>
+                    <ListItemText
+                        sx={{ my: 0 }}
+                        primary="Firebash"
+                        primaryTypographyProps={{
+                            fontSize: 20,
+                            fontWeight: 'medium',
+                            letterSpacing: 0,
+                        }}
+                    />
+                    <Dialog open={this.state.triggerAddAlert} onClose={this.addTask}>
+                        <DialogTitle>Add Task</DialogTitle>
+                        <DialogContent>
+                            <DialogContentText>
+                                Add your task description
+                            </DialogContentText>
+                            <TextField
+                                autoFocus
+                                margin="dense"
+                                id="name"
+                                label="Email Address"
+                                type="email"
+                                fullWidth
+                                variant="standard"
+                                onChange={this.handleTextFieldChange}
+                            />
+                        </DialogContent>
+                        <DialogActions>
+                            <Button onClick={this.addTask}>Submit</Button>
+                        </DialogActions>
+                    </Dialog>
+                </ListItemButton>
             </List>
         );
     }
