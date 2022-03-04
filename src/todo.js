@@ -15,7 +15,8 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import {
-    getFirestore
+    getFirestore,
+    connectFirestoreEmulator
 } from "firebase/firestore";
 
 class Todo extends React.Component {
@@ -31,7 +32,7 @@ class Todo extends React.Component {
         }
         this.state.checked = Array(this.state.tasks.length).fill(false);
         if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development')
-            connectAuthEmulator(this.db, "http://localhost:8080");
+            connectFirestoreEmulator(this.db, "http://localhost:8080");
     }
 
     handleCheck(index) {
